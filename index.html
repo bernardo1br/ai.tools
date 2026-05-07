@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard de Risco - Ferramentas de IA</title>
+  <link rel="stylesheet" href="https://use.typekit.net/iba4brs.css" />
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f6f6;
+      --surface: #ffffff;
+      --surface-muted: #eef0ef;
+      --text: #1e1e1e;
+      --muted: #666e6d;
+      --border: #b2bab9;
+      --border-strong: #444444;
+      --dark: #444444;
+      --blue: #00b2ff;
+      --blue-soft: #d8f3ff;
+      --gray: #b2bab9;
+      --red-bg: #fc745c;
+      --red: #fc745c;
+      --red-text: #1e1e1e;
+      --green-bg: #d0ffcc;
+      --green: #2f6f38;
+      --green-text: #28522e;
+      --emerald-bg: #d0ffcc;
+      --emerald: #2f6f38;
+      --yellow-bg: #fffcd3;
+      --yellow-text: #706600;
+      --yellow-border: #d7d08b;
+      --focus: #00b2ff;
+      --shadow: none;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: freight-sans-pro, "Helvetica Neue", Helvetica, Arial, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button:focus-visible,
+    input:focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--focus) 26%, transparent);
+      outline-offset: 2px;
+    }
+
+    .page {
+      width: min(1220px, 100%);
+      margin: 0 auto;
+      padding: 34px 28px;
+    }
+
+    .hero,
+    .panel,
+    .footer,
+    .tool-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 330px);
+      gap: 34px;
+      align-items: end;
+      padding: 42px;
+      border-top: 8px solid var(--blue);
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      overflow-wrap: break-word;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin: 0;
+      font-size: clamp(34px, 5vw, 58px);
+      font-weight: 700;
+      line-height: 1.02;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      min-width: 0;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 18px 12px 16px;
+      text-align: center;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 34px;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: lowercase;
+    }
+
+    .metric.red {
+      background: var(--red-bg);
+      color: var(--text);
+      border-color: var(--red);
+    }
+
+    .metric.green {
+      background: var(--green-bg);
+      color: var(--green);
+      border-color: var(--green-bg);
+    }
+
+    .metric.slate {
+      background: var(--surface-muted);
+      color: var(--text);
+    }
+
+    .metric.blue {
+      background: var(--blue);
+      color: var(--text);
+      border-color: var(--blue);
+    }
+
+    .rule-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .rule {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 22px;
+    }
+
+    .rule h2 {
+      margin: 0 0 10px;
+      font-size: 22px;
+      font-weight: 450;
+    }
+
+    .rule p {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .rule.red {
+      background: var(--red-bg);
+      color: var(--red-text);
+      border-color: var(--red);
+    }
+
+    .rule.yellow {
+      background: var(--yellow-bg);
+      color: var(--yellow-text);
+      border-color: var(--yellow-border);
+    }
+
+    .rule.green {
+      background: var(--green-bg);
+      color: var(--green-text);
+      border-color: var(--green-bg);
+    }
+
+    .panel {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      column-gap: 24px;
+      row-gap: 18px;
+      align-items: center;
+      margin-top: 20px;
+      padding: 18px 20px;
+    }
+
+    .filter-title {
+      justify-self: start;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .controls {
+      display: contents;
+    }
+
+    .filter-stack {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(118px, 1fr));
+      gap: 10px 12px;
+      justify-self: center;
+      width: min(330px, 100%);
+    }
+
+    .filter-stack .filter[data-filter="Todos"] {
+      grid-column: 1 / -1;
+      justify-self: center;
+      width: 118px;
+    }
+
+    .search-wrap {
+      justify-self: end;
+      width: min(420px, 100%);
+    }
+
+    .search-field {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 11px 14px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .filter {
+      min-height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 10px 14px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    .filter:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+
+    .filter.active {
+      background: var(--blue);
+      color: var(--text);
+      border-color: var(--blue);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .tool-card {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+      padding: 26px;
+    }
+
+    .tool-card[hidden] {
+      display: none;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .segment {
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .tool-card h3 {
+      margin: 8px 0 4px;
+      font-size: 28px;
+      font-weight: 450;
+      line-height: 1.08;
+    }
+
+    .plan {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      min-height: 30px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .badge.alto {
+      background: var(--red-bg);
+      color: var(--text);
+      border-color: var(--red);
+    }
+
+    .badge.baixo {
+      background: var(--green-bg);
+      color: var(--green);
+      border-color: var(--green-bg);
+    }
+
+    .badge.muito-baixo {
+      background: var(--emerald-bg);
+      color: var(--emerald);
+      border-color: var(--green-bg);
+    }
+
+    .badge.indeterminado {
+      background: var(--surface-muted);
+      color: var(--text);
+    }
+
+    .risk-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      border-radius: 4px;
+      padding: 12px;
+      background: var(--bg);
+    }
+
+    .risk-row span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .bars {
+      display: flex;
+      gap: 4px;
+    }
+
+    .bar {
+      width: 30px;
+      height: 8px;
+      border-radius: 0;
+      background: var(--gray);
+    }
+
+    .bar.on {
+      background: var(--blue);
+    }
+
+    .info-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .info-box {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 14px;
+    }
+
+    .two-cols {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .label {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .info-box p:last-child {
+      margin: 0;
+      color: var(--dark);
+      font-size: 14px;
+    }
+
+    .guidance {
+      border-radius: 4px;
+      padding: 16px;
+      background: var(--blue);
+      color: var(--text);
+    }
+
+    .guidance .label {
+      color: var(--text);
+    }
+
+    .guidance p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .safer {
+      margin-top: 12px;
+      border-radius: 2px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.48);
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      padding: 28px;
+    }
+
+    .footer h2 {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 450;
+    }
+
+    .footer-note {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .matrix-card {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px;
+    }
+
+    .matrix-card strong,
+    .matrix-card b,
+    .matrix-card span {
+      display: block;
+      font-weight: 700;
+    }
+
+    .matrix-card strong {
+      font-size: 14px;
+    }
+
+    .matrix-card b {
+      margin-top: 8px;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .matrix-card span {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .empty {
+      display: none;
+      margin-top: 18px;
+      border: 1px dashed var(--border-strong);
+      border-radius: 4px;
+      padding: 22px;
+      background: var(--surface);
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        padding: 18px;
+      }
+
+      .panel,
+      .hero,
+      .rule-grid,
+      .cards,
+      .matrix,
+      .two-cols {
+        grid-template-columns: 1fr;
+      }
+
+      .summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .filter-title,
+      .filter-stack,
+      .search-wrap {
+        justify-self: stretch;
+      }
+
+      .search-wrap {
+        width: 100%;
+      }
+
+      .filter-stack {
+        width: min(360px, 100%);
+        justify-self: center;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .hero,
+      .tool-card,
+      .footer,
+      .panel {
+        border-radius: 6px;
+      }
+
+      .hero {
+        padding: 20px;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      .card-top,
+      .risk-row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .badge {
+        width: fit-content;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero" aria-labelledby="pageTitle">
+      <div>
+        <p class="eyebrow">Guia rápido para usuários</p>
+        <h1 id="pageTitle">Uso de ferramentas de IA e risco de treinamento com dados</h1>
+        <p class="subtitle">Use este painel para decidir quando é aceitável inserir dados em ferramentas de IA. A regra prática é simples: contas individuais exigem cautela máxima; planos corporativos com acordo específico sobre tratamento de dados pessoais e proibição de treinamento são preferenciais para uso profissional.</p>
+      </div>
+
+      <div class="summary" aria-label="Resumo dos resultados visíveis">
+        <div class="metric red"><strong id="metricHigh">0</strong><span>alto risco</span></div>
+        <div class="metric green"><strong id="metricLow">0</strong><span>preferenciais</span></div>
+      </div>
+    </section>
+
+    <section class="rule-grid" aria-label="Regras rápidas de uso">
+      <div class="rule red">
+        <h2>Não usar</h2>
+        <p>Dados pessoais sensíveis, documentos de clientes, segredos comerciais, dados estratégicos ou informações sujeitas a sigilo profissional em contas individuais.</p>
+      </div>
+      <div class="rule yellow">
+        <h2>Usar com controles</h2>
+        <p>Dados internos de baixo risco somente com anonimização, minimização, opt-out de treinamento e configuração adequada de histórico/retenção.</p>
+      </div>
+      <div class="rule green">
+        <h2>Preferir</h2>
+        <p>Planos corporativos com acordo específico sobre tratamento de dados pessoais, proibição contratual de treinamento, retenção definida, suboperadores mapeados e controles de acesso corporativos.</p>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="filterTitle">
+      <div class="filter-title" id="filterTitle">Filtrar painel</div>
+      <div class="controls" role="group" aria-label="Filtros do painel">
+        <div class="filter-stack">
+          <button class="filter" type="button" data-filter="Individual" aria-pressed="false">Individual</button>
+          <button class="filter" type="button" data-filter="Corporativo" aria-pressed="false">Corporativo</button>
+          <button class="filter active" type="button" data-filter="Todos" aria-pressed="true">Todos</button>
+        </div>
+        <div class="search-wrap">
+          <label class="sr-only" for="searchInput">Buscar ferramenta, plano ou regra</label>
+          <input class="search-field" id="searchInput" type="search" placeholder="Buscar ferramenta, plano ou regra..." autocomplete="off" />
+        </div>
+      </div>
+    </section>
+
+    <main class="cards" id="cards" aria-live="polite"></main>
+    <div class="empty" id="emptyState">Nenhum resultado encontrado para o filtro aplicado.</div>
+
+    <footer class="footer">
+      <h2>Matriz de decisão rápida</h2>
+      <p class="footer-note">Revise os termos oficiais e o contrato vigente antes de inserir dados pessoais, confidenciais ou de clientes.</p>
+      <div class="matrix">
+        <div class="matrix-card"><strong>Dado público</strong><b>Pode usar</b><span>Preferir minimização e checar fontes.</span></div>
+        <div class="matrix-card"><strong>Dado interno comum</strong><b>Usar com cautela</b><span>Anonimizar e evitar contas individuais.</span></div>
+        <div class="matrix-card"><strong>Dado pessoal / cliente</strong><b>Usar só em plano corporativo</b><span>Somente com acordo específico sobre tratamento de dados pessoais.</span></div>
+        <div class="matrix-card"><strong>Dado sensível / sigiloso</strong><b>Regra geral: não usar</b><span>Só com aprovação formal, ambiente contratado e controles reforçados.</span></div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const tools = [
+      {
+        vendor: "OpenAI",
+        product: "ChatGPT",
+        plan: "Free / Plus / Pro individual",
+        segment: "Individual",
+        risk: "Alto",
+        riskScore: 4,
+        training: "Pode usar conteúdo de chats web/app para desenvolver e melhorar serviços/modelos, salvo opt-out.",
+        retention: "Política geral não detalha todos os prazos; exige atenção a configurações de histórico, chats temporários e exclusão.",
+        personalData: "Não há cláusulas específicas sobre tratamento de dados pessoais para o uso individual comum.",
+        userGuidance: "Não inserir dados pessoais sensíveis, documentos de clientes, informações confidenciais ou segredos de negócio. Usar apenas para conteúdos públicos, genéricos ou devidamente anonimizados.",
+        saferUse: "Opt-out de treinamento + uso de chats temporários quando disponíveis."
+      },
+      {
+        vendor: "OpenAI",
+        product: "ChatGPT",
+        plan: "Team / Enterprise / Business",
+        segment: "Corporativo",
+        risk: "Baixo",
+        riskScore: 1,
+        training: "Conteúdo do cliente não é usado para desenvolver ou melhorar os serviços sem consentimento explícito.",
+        retention: "Exclusão do conteúdo do cliente em até 30 dias após término, salvo obrigação legal ou ajuste contratual.",
+        personalData: "Há acordo específico sobre tratamento de dados pessoais, com instruções documentadas, medidas de segurança, suboperadores e regras de retorno ou exclusão.",
+        userGuidance: "Preferencial para uso profissional. Ainda exige classificação de dados, controles internos, logs e política de uso aceitável.",
+        saferUse: "Contrato empresarial + acordo sobre tratamento de dados pessoais + regras internas de classificação e anonimização."
+      },
+      {
+        vendor: "Anthropic",
+        product: "Claude",
+        plan: "Free / Pro / Max consumidor",
+        segment: "Individual",
+        risk: "Alto",
+        riskScore: 4,
+        training: "Pode usar inputs, outputs e arquivos para melhorar serviços e treinar modelos, salvo desativação de Model Improvement. Conversas sinalizadas e feedback podem continuar sendo usados.",
+        retention: "Conversas excluídas: remoção de backend em até 30 dias. Dados usados para treinamento podem ser retidos por até 5 anos.",
+        personalData: "Não há cláusulas específicas sobre tratamento de dados pessoais para o uso individual comum.",
+        userGuidance: "Não usar para documentos de clientes, dados pessoais sensíveis ou informações confidenciais. Risco relevante de retenção prolongada se houver uso para treinamento.",
+        saferUse: "Desativar Model Improvement + usar chats incognito quando disponíveis."
+      },
+      {
+        vendor: "Anthropic",
+        product: "Claude",
+        plan: "Team / Enterprise / API / Claude for Work",
+        segment: "Corporativo",
+        risk: "Baixo",
+        riskScore: 1,
+        training: "Dados da organização não são usados para treinamento, salvo adesão específica a programa de desenvolvimento.",
+        retention: "Inputs e outputs empresariais/API tendem a ser apagados em até 30 dias; há opção de Zero Data Retention para APIs elegíveis.",
+        personalData: "Nos produtos comerciais, o tratamento de dados pessoais segue as instruções do cliente e as condições contratuais aplicáveis.",
+        userGuidance: "Adequado para uso profissional, condicionado à contratação correta, revisão das cláusulas de proteção de dados pessoais, suboperadores e transferências internacionais.",
+        saferUse: "Plano corporativo + acordo sobre tratamento de dados pessoais + avaliar Zero Data Retention para casos sensíveis."
+      },
+      {
+        vendor: "Anthropic via AWS Bedrock",
+        product: "Claude no Bedrock",
+        plan: "Ambiente AWS corporativo",
+        segment: "Corporativo",
+        risk: "Muito baixo",
+        riskScore: 0,
+        training: "Anthropic não teria acesso a prompts/outputs no ambiente AWS e não treinaria modelos com esse conteúdo.",
+        retention: "Depende da arquitetura e configuração AWS/cliente; dados de uso podem existir.",
+        personalData: "Regido pelo contrato com a AWS e pelos termos específicos do serviço, incluindo as condições aplicáveis ao tratamento de dados pessoais.",
+        userGuidance: "Opção mais segura para fluxos corporativos sensíveis, desde que a arquitetura AWS, logs e permissões estejam corretamente configurados.",
+        saferUse: "Controle de IAM, logging, segregação de ambientes e revisão do contrato AWS/Bedrock."
+      },
+      {
+        vendor: "Perplexity",
+        product: "Perplexity Consumer",
+        plan: "Free / Pro / Max",
+        segment: "Individual",
+        risk: "Alto",
+        riskScore: 4,
+        legalTerms: "Termos gerais de serviço + política de privacidade. Esses termos excluem expressamente Perplexity Enterprise Pro e Enterprise Max.",
+        training: "Nos termos gerais, não há compromisso empresarial de não uso para treinamento. Eles concedem licença ampla para usar conteúdo do usuário para operar, melhorar, promover e prestar os serviços; a política de privacidade prevê opt-out de coleta para IA nas configurações.",
+        retention: "A política informa retenção pelo tempo razoavelmente necessário e objetivo de excluir dados pessoais em até 30 dias após exclusão da conta.",
+        personalData: "Não há cláusulas específicas sobre tratamento de dados pessoais para o uso individual/consumidor; a Perplexity define as finalidades e meios de tratamento nesses serviços.",
+        userGuidance: "Não tratar Pro/Max consumidor como Enterprise. Não usar para dados pessoais de clientes, documentos confidenciais, segredos comerciais ou uso profissional sem contrato adequado.",
+        saferUse: "Ativar opt-out de coleta para IA, minimizar prompts e usar apenas dados públicos ou anonimizados."
+      },
+      {
+        vendor: "Perplexity",
+        product: "Perplexity Enterprise",
+        plan: "Enterprise Pro / Enterprise Max",
+        segment: "Corporativo",
+        risk: "Baixo",
+        riskScore: 1,
+        legalTerms: "Termos Enterprise de serviço + acordo incorporado sobre tratamento de dados pessoais. Aplicável somente a contas Enterprise Pro/Max contratadas por uma entidade empresarial.",
+        training: "Os termos Enterprise afirmam que o Conteúdo do Cliente não será usado, nem terá terceiros autorizados a usá-lo, para treinar, retreinar, fazer fine-tuning ou melhorar modelos generativos.",
+        retention: "Após término, as partes devem devolver ou destruir informações confidenciais; cópias em backups seguem procedimentos padrão de eliminação. Dados pessoais são regidos pelo acordo incorporado sobre tratamento de dados pessoais.",
+        personalData: "Os termos Enterprise incorporam acordo específico para tratamento de dados pessoais.",
+        userGuidance: "Pode ser considerado para uso profissional quando contratado como Enterprise Pro/Max, com revisão das cláusulas de proteção de dados pessoais, modelos de terceiros, provedores de dados conectados e controles internos.",
+        saferUse: "Enterprise Pro/Max + acordo sobre tratamento de dados pessoais + classificação de dados + revisão de modelos terceiros e integrações conectadas."
+      }
+    ];
+
+    const filters = document.querySelectorAll(".filter");
+    const cardsContainer = document.getElementById("cards");
+    const emptyState = document.getElementById("emptyState");
+    const searchInput = document.getElementById("searchInput");
+    const metricHigh = document.getElementById("metricHigh");
+    const metricLow = document.getElementById("metricLow");
+
+    let currentFilter = "Todos";
+
+    function riskClass(risk) {
+      const classes = {
+        Alto: "alto",
+        Baixo: "baixo",
+        "Muito baixo": "muito-baixo"
+      };
+
+      return classes[risk] || "indeterminado";
+    }
+
+    function getSearchText(tool) {
+      return [
+        tool.vendor,
+        tool.product,
+        tool.plan,
+        tool.segment,
+        tool.risk,
+        tool.legalTerms,
+        tool.training,
+        tool.retention,
+        tool.personalData,
+        tool.userGuidance,
+        tool.saferUse
+      ].join(" ").toLocaleLowerCase("pt-BR");
+    }
+
+    function normalizeText(text) {
+      return text.toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function appendTextElement(parent, tagName, className, text) {
+      const element = document.createElement(tagName);
+      if (className) element.className = className;
+      element.textContent = text;
+      parent.append(element);
+      return element;
+    }
+
+    function createInfoBox(label, text) {
+      const box = document.createElement("div");
+      box.className = "info-box";
+      appendTextElement(box, "p", "label", label);
+      appendTextElement(box, "p", "", text);
+      return box;
+    }
+
+    function createRiskBars(score) {
+      const bars = document.createElement("div");
+      bars.className = "bars";
+      bars.setAttribute("aria-label", `Risco ${score} de 4`);
+
+      for (let index = 0; index < 4; index += 1) {
+        const bar = document.createElement("span");
+        bar.className = index < score ? "bar on" : "bar";
+        bars.append(bar);
+      }
+
+      return bars;
+    }
+
+    function createCard(tool) {
+      const article = document.createElement("article");
+      article.className = "tool-card";
+      article.dataset.segment = tool.segment;
+      article.dataset.segmentKey = normalizeText(tool.segment);
+      article.dataset.search = getSearchText(tool);
+      article.dataset.risk = tool.risk;
+
+      const top = document.createElement("div");
+      top.className = "card-top";
+
+      const titleGroup = document.createElement("div");
+      appendTextElement(titleGroup, "div", "segment", tool.segment);
+      appendTextElement(titleGroup, "h3", "", tool.vendor);
+      appendTextElement(titleGroup, "p", "plan", `${tool.product} · ${tool.plan}`);
+
+      const badge = appendTextElement(top, "span", `badge ${riskClass(tool.risk)}`, tool.risk);
+      top.prepend(titleGroup);
+      top.append(badge);
+      article.append(top);
+
+      const riskRow = document.createElement("div");
+      riskRow.className = "risk-row";
+      appendTextElement(riskRow, "span", "", "Intensidade do risco");
+      riskRow.append(createRiskBars(tool.riskScore));
+      article.append(riskRow);
+
+      const infoGrid = document.createElement("div");
+      infoGrid.className = "info-grid";
+      if (tool.legalTerms) {
+        infoGrid.append(createInfoBox("Termos aplicáveis", tool.legalTerms));
+      }
+      infoGrid.append(createInfoBox("Treinamento / melhoria de modelos", tool.training));
+
+      const twoCols = document.createElement("div");
+      twoCols.className = "two-cols";
+      twoCols.append(createInfoBox("Retenção", tool.retention));
+      twoCols.append(createInfoBox("Proteção de Dados Pessoais", tool.personalData));
+      infoGrid.append(twoCols);
+
+      const guidance = document.createElement("div");
+      guidance.className = "guidance";
+      appendTextElement(guidance, "p", "label", "Orientação ao usuário");
+      appendTextElement(guidance, "p", "", tool.userGuidance);
+
+      const safer = document.createElement("div");
+      safer.className = "safer";
+      const saferLabel = document.createElement("strong");
+      saferLabel.textContent = "Uso mais seguro: ";
+      safer.append(saferLabel, tool.saferUse);
+      guidance.append(safer);
+      infoGrid.append(guidance);
+
+      article.append(infoGrid);
+      return article;
+    }
+
+    function updateMetrics(visibleCards) {
+      const counts = visibleCards.reduce(
+        (total, card) => {
+          if (card.dataset.risk === "Alto") total.high += 1;
+          if (card.dataset.risk === "Baixo" || card.dataset.risk === "Muito baixo") total.low += 1;
+          return total;
+        },
+        { high: 0, low: 0 }
+      );
+
+      metricHigh.textContent = counts.high;
+      metricLow.textContent = counts.low;
+    }
+
+    function applyFilters() {
+      const query = normalizeText(searchInput.value.trim());
+      const cards = [...document.querySelectorAll(".tool-card")];
+      const visibleCards = [];
+      const currentFilterKey = normalizeText(currentFilter);
+
+      cards.forEach((card) => {
+        const matchesSegment = currentFilterKey === "todos" || card.dataset.segmentKey === currentFilterKey;
+        const matchesQuery = !query || normalizeText(card.dataset.search).includes(query);
+        const shouldShow = matchesSegment && matchesQuery;
+
+        card.hidden = !shouldShow;
+        if (shouldShow) visibleCards.push(card);
+      });
+
+      updateMetrics(visibleCards);
+      emptyState.style.display = visibleCards.length === 0 ? "block" : "none";
+    }
+
+    function setActiveFilter(selectedButton) {
+      filters.forEach((button) => {
+        const isActive = button === selectedButton;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+
+      currentFilter = selectedButton.dataset.filter;
+      applyFilters();
+    }
+
+    function renderCards() {
+      const fragment = document.createDocumentFragment();
+      tools.forEach((tool) => fragment.append(createCard(tool)));
+      cardsContainer.replaceChildren(fragment);
+      applyFilters();
+    }
+
+    filters.forEach((button) => {
+      button.addEventListener("click", () => setActiveFilter(button));
+    });
+
+    searchInput.addEventListener("input", applyFilters);
+    renderCards();
+  </script>
+</body>
+</html>
